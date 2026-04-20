@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome - SupportHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 6rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        height: 100%;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: white;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+    
+    .feature-description {
+        color: #64748b;
+        line-height: 1.7;
+    }
+    
+    .stats-section {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        padding: 4rem 0;
+        margin: 4rem 0;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .cta-section {
+        padding: 4rem 0;
+        text-align: center;
+    }
+    
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-subtitle {
+        font-size: 1.25rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title">Support Made Simple</h1>
+                <p class="hero-subtitle">
+                    Manage customer support tickets efficiently with our powerful, easy-to-use platform.
+                    Track, resolve, and analyze support requests all in one place.
+                </p>
+                <div class="d-flex gap-3 mb-4">
+                    <a href="{% url 'users:register' %}" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-rocket-takeoff"></i> Get Started Free
+                    </a>
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    </a>
+                </div>
+                <p class="small mb-0">
+                    <i class="bi bi-check-circle-fill"></i> No credit card required
+                    <span class="mx-2">•</span>
+                    <i class="bi bi-check-circle-fill"></i> Free forever plan
+                </p>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="text-center">
+                    <i class="bi bi-headset" style="font-size: 15rem; opacity: 0.2;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3">Everything You Need</h2>
+        <p class="lead text-muted">Powerful features to streamline your support workflow</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <h3 class="feature-title">Lightning Fast</h3>
+                <p class="feature-description">
+                    Create and manage tickets in seconds. Our streamlined interface ensures you spend less time on admin and more time solving problems.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 class="feature-title">Secure & Private</h3>
+                <p class="feature-description">
+                    Enterprise-grade security keeps your data safe. Role-based access control ensures team members see only what they need.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-bell-fill"></i>
+                </div>
+                <h3 class="feature-title">Real-time Notifications</h3>
+                <p class="feature-description">
+                    Stay updated with instant notifications. Never miss an important update or customer message again.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <h3 class="feature-title">Analytics & Reports</h3>
+                <p class="feature-description">
+                    Track team performance with detailed analytics. Make data-driven decisions to improve support quality.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h3 class="feature-title">Team Collaboration</h3>
+                <p class="feature-description">
+                    Assign tickets to team members, add internal notes, and collaborate seamlessly to resolve issues faster.
+                </p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-tags-fill"></i>
+                </div>
+                <h3 class="feature-title">Smart Categories</h3>
+                <p class="feature-description">
+                    Organize tickets with custom categories and priorities. Find what you need instantly with powerful filtering.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <span class="stat-number">99%</span>
+                    <span class="stat-label">Customer Satisfaction</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Support Available</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <span class="stat-number">2.5h</span>
+                    <span class="stat-label">Avg Response Time</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-item">
+                    <span class="stat-number">10k+</span>
+                    <span class="stat-label">Tickets Resolved</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Transform Your Support?</h2>
+        <p class="cta-subtitle">Join thousands of teams already using SupportHub</p>
+        <a href="{% url 'users:register' %}" class="btn btn-custom-primary btn-lg px-5">
+            Start Your Free Trial <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

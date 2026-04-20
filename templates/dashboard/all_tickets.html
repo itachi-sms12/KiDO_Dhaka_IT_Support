@@ -1,0 +1,913 @@
+{% extends 'base.html' %}
+
+{% block title %}All Tickets - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-nav {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+    }
+    
+    .nav-item {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        color: #64748b;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .nav-item:hover {
+    /* background: #f1f5f9; */
+    color: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    
+    .nav-item.active {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-box {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .stat-icon.blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+    
+    .stat-icon.green {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .stat-icon.orange {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .stat-icon.red {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+    
+    .stat-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-change {
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.5rem;
+    }
+    
+    .stat-change.positive {
+        color: #10b981;
+    }
+    
+    .stat-change.negative {
+        color: #ef4444;
+    }
+    
+    .filters-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-label {
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .filter-select {
+        padding: 0.625rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-select:focus {
+        border-color: #3b82f6;
+        outline: none;
+    }
+    
+    .search-bar {
+        position: relative;
+        flex: 1;
+    }
+    
+    .search-bar input {
+        width: 100%;
+        padding: 0.625rem 1rem 0.625rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    
+    .search-bar input:focus {
+        border-color: #3b82f6;
+        outline: none;
+    }
+    
+    .search-bar i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    
+    .tickets-table-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .table-header {
+        padding: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .table-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .tickets-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .tickets-table thead {
+        background: #f8fafc;
+    }
+    
+    .tickets-table th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 700;
+        color: #475569;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .tickets-table td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+    
+    .tickets-table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .tickets-table tbody tr:hover {
+        background: #f8fafc;
+    }
+    
+    .ticket-id-link {
+        font-weight: 700;
+        color: #3b82f6;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .ticket-id-link:hover {
+        color: #2563eb;
+    }
+    
+    .ticket-subject {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .ticket-excerpt {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+    
+    .customer-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .customer-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+    
+    .customer-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .badge-table {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+    
+    .badge-open {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-in-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .badge-resolved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-closed {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .priority-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .priority-low {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .priority-medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .priority-high {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .priority-urgent {
+        background: #fecaca;
+        color: #7f1d1d;
+        animation: pulse 2s infinite;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem;
+        border: none;
+        border-radius: 0.375rem;
+        background: #f1f5f9;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-action:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+    
+    .btn-view {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .btn-view:hover {
+        background: #bfdbfe;
+    }
+    
+    .pagination {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid #f1f5f9;
+    }
+    
+    .pagination-info {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+    
+    .pagination-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-page {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+        color: #64748b;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-page:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+    
+    .btn-page.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+    
+    .btn-page:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .bulk-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .btn-bulk {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-bulk-assign {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .btn-bulk-assign:hover {
+        background: #bfdbfe;
+    }
+    
+    .btn-bulk-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .btn-bulk-delete:hover {
+        background: #fecaca;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!--<div class="dashboard-header">
+    <div class="container">
+        <h1><i class="bi bi-speedometer2 me-2"></i>Staff Dashboard</h1>
+        <p class="mb-0 opacity-90">Manage and monitor all support tickets</p>
+    </div>
+</div>-->
+
+<div class="container mb-5">
+    <div class="dashboard-nav">
+        <a href="{% url 'dashboard:all_tickets' %}" class="nav-item active">
+            <i class="bi bi-ticket-perforated"></i>All Tickets
+        </a>
+        <a href="{% url 'dashboard:manage_categories' %}" class="nav-item">
+            <i class="bi bi-folder"></i>Categories
+        </a>
+        <a href="{% url 'dashboard:manage_users' %}" class="nav-item">
+            <i class="bi bi-people"></i>Users
+        </a>
+        <a href="{% url 'dashboard:reports' %}" class="nav-item">
+            <i class="bi bi-graph-up"></i>Reports
+        </a>
+    </div>
+    
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ total_tickets }}</div>
+                    <div class="stat-label">Total Tickets</div>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i>12% from last week
+                    </div>
+                </div>
+                <div class="stat-icon blue">
+                    <i class="bi bi-ticket-perforated"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ open_tickets }}</div>
+                    <div class="stat-label">Open Tickets</div>
+                    <div class="stat-change negative">
+                        <i class="bi bi-arrow-down"></i>8% from yesterday
+                    </div>
+                </div>
+                <div class="stat-icon orange">
+                    <i class="bi bi-circle"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ in_progress_tickets }}</div>
+                    <div class="stat-label">In Progress</div>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i>15% from yesterday
+                    </div>
+                </div>
+                <div class="stat-icon blue">
+                    <i class="bi bi-arrow-repeat"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ resolved_tickets }}</div>
+                    <div class="stat-label">Resolved</div>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i>23% from last week
+                    </div>
+                </div>
+                <div class="stat-icon green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="filters-card">
+        <form method="get" id="filterForm">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select name="status" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="open" {% if request.GET.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="resolved" {% if request.GET.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Priority</label>
+                    <select name="priority" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Priorities</option>
+                        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+                        <option value="urgent" {% if request.GET.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Category</label>
+
+                    <select name="category" class="filter-select" onchange="this.form.submit()">
+
+                        <option value="">All Categories</option>
+
+                        {% for cat in categories %}
+                            <option value="{{ cat.name }}"
+                                {% if request.GET.category == cat.name %}selected{% endif %}
+                            >
+                                {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                
+                <div class="filter-group">
+                    <label class="filter-label">Assigned To</label>
+                    <select name="assigned" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Staff</option>
+                        <option value="me" {% if request.GET.assigned == 'me' %}selected{% endif %}>Assigned to Me</option>
+                        <option value="unassigned" {% if request.GET.assigned == 'unassigned' %}selected{% endif %}>Unassigned</option>
+                        {% for staff in staff_members %}
+                        <option value="{{ staff.id }}" {% if request.GET.assigned == staff.id|stringformat:"s" %}selected{% endif %}>{{ staff.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="search-bar">
+                <i class="bi bi-search"></i>
+                <input type="text" name="search" placeholder="Search tickets by ID, subject, or customer..." value="{{ request.GET.search }}">
+            </div>
+        </form>
+    </div>
+    
+    <div class="tickets-table-card">
+        <div class="table-header">
+            <div class="table-title">
+                <i class="bi bi-list-ul"></i>
+                All Tickets ({{ tickets.count }})
+            </div>
+            <div class="bulk-actions">
+                <input type="checkbox" id="selectAll" title="Select all">
+                {% if request.user.is_staff %}
+                <button class="btn-bulk btn-bulk-assign" onclick="bulkAssign()">
+                    <i class="bi bi-person-plus me-1"></i>Assign
+                </button>
+                <button class="btn-bulk btn-bulk-delete" onclick="bulkDelete()">
+                    <i class="bi bi-trash me-1"></i>Delete
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="tickets-table">
+                <thead>
+                    <tr>
+                        <th width="40"></th>
+                        <th>Ticket</th>
+                        <th>Subject</th>
+                        <th>Users</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Category</th>
+                        <th>Assigned</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="ticket-checkbox" value="{{ ticket.id }}">
+                        </td>
+                        <td>
+                            <a href="{% url 'tickets:ticket_detail' ticket.id %}" class="ticket-id-link">
+                                <i class="bi bi-hash"></i>{{ ticket.id }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="ticket-subject">{{ ticket.title|truncatewords:10 }}</div>
+                            <div class="ticket-excerpt">{{ ticket.description|truncatewords:8 }}</div>
+                        </td>
+                        <td>
+                            <div class="customer-info">
+                                <div class="customer-avatar">
+                                    {{ ticket.created_by.username|slice:":1"|upper }}
+                                </div>
+                                <div class="customer-name">{{ ticket.created_by.username }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-table badge-{{ ticket.status }}">
+                                {{ ticket.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="priority-badge priority-{{ ticket.priority }}">
+                                {{ ticket.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>{{ ticket.category }}</td>
+                        <td>
+                            {% if ticket.assigned_to %}
+                                <div class="customer-info">
+                                    <div class="customer-avatar" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                        {{ ticket.assigned_to.username|slice:":1"|upper }}
+                                    </div>
+                                    <span style="font-size: 0.875rem;">{{ ticket.assigned_to.username }}</span>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="font-size: 0.875rem;">{{ ticket.created_at|date:"M d, Y" }}</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">{{ ticket.created_at|time:"H:i" }}</div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'tickets:ticket_detail' ticket.id %}" class="btn-action btn-view" title="View">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <!-- <button class="btn-action" onclick="assignTicket('{{ ticket.id }}')" title="Assign">
+                                    <i class="bi bi-person-plus"></i>
+                                </button> -->
+                                <a href="{% url 'tickets:edit' ticket.id %}" class="btn-action" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 3rem;">
+                            <div style="color: #94a3b8;">
+                                <i class="bi bi-inbox" style="font-size: 3rem; display: block; margin-bottom: 1rem;"></i>
+                                No tickets found matching your filters
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if tickets %}
+        <div class="pagination">
+            <div class="pagination-info">
+                Showing {{ tickets.start_index }} to {{ tickets.end_index }} of {{ tickets.paginator.count }} tickets
+            </div>
+            <div class="pagination-buttons">
+                {% if tickets.has_previous %}
+                    <button class="btn-page" onclick="goToPage('{{ tickets.previous_page_number }}')">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                {% endif %}
+                
+                {% for num in tickets.paginator.page_range %}
+                    {% if num == tickets.number %}
+                        <button class="btn-page active">{{ num }}</button>
+                    {% elif num > tickets.number|add:'-3' and num < tickets.number|add:'3' %}
+                        <button class="btn-page" onclick="goToPage('{{ num }}')">{{ num }}</button>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if tickets.has_next %}
+                    <button class="btn-page" onclick="goToPage('{{ tickets.next_page_number }}')">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCSRFToken() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : '';
+}
+
+$(document).ready(function() {
+  // === Autocomplete for staffName field ===
+  $('#staffName').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: '{% url "dashboard:staff_search" %}',
+        data: { q: request.term },
+        success: function(data) {
+          response($.map(data, function(item) {
+            return {
+              label: item.name,
+              value: item.name,
+              id: item.id
+            };
+          }));
+        }
+      });
+    },
+    select: function(event, ui) {
+      $('#staffId').val(ui.item.id);
+    }
+  });
+});
+
+// === Select All checkbox ===
+document.getElementById('selectAll').addEventListener('change', function() {
+    document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.checked = this.checked);
+});
+
+// === Pagination helper ===
+function goToPage(page) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', page);
+    window.location.href = url.toString();
+}
+
+// === Bulk Assign with Staff Search Modal ===
+async function bulkAssign() {
+    const selected = Array.from(document.querySelectorAll('.ticket-checkbox:checked')).map(cb => cb.value);
+    if (!selected.length) return alert('Select at least one ticket.');
+
+    // Modal container
+    const modal = document.createElement('div');
+    modal.style = `
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff; padding: 20px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        border-radius: 10px; z-index: 9999;
+        width: 300px;
+    `;
+
+    // Input + results + close button
+    const staffInput = document.createElement('input');
+    staffInput.type = 'text';
+    staffInput.placeholder = 'Type staff name...';
+    staffInput.style = 'width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;';
+
+    const resultBox = document.createElement('div');
+    resultBox.style = 'background: white; border: 1px solid #ddd; margin-top: 5px; max-height: 200px; overflow-y: auto; border-radius: 6px;';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style = 'position: absolute; top: 8px; right: 12px; border: none; background: none; font-size: 18px; cursor: pointer;';
+    closeBtn.addEventListener('click', () => modal.remove());
+
+    modal.appendChild(closeBtn);
+    modal.appendChild(staffInput);
+    modal.appendChild(resultBox);
+    document.body.appendChild(modal);
+
+    // Live search
+    staffInput.addEventListener('input', async () => {
+        const q = staffInput.value.trim();
+        if (!q) { resultBox.innerHTML = ''; return; }
+        const res = await fetch(`{% url 'dashboard:staff_search' %}?q=${encodeURIComponent(q)}`);
+        if (!res.ok) { resultBox.innerHTML = '<div style="padding:8px;color:red;">Error loading staff list</div>'; return; }
+        const data = await res.json();
+        resultBox.innerHTML = '';
+
+        if (data.length === 0) {
+            resultBox.innerHTML = '<div style="padding:8px;color:#777;">No results found</div>';
+            return;
+        }
+
+        data.forEach(user => {
+            const item = document.createElement('div');
+            item.textContent = user.name;
+            item.style = 'padding: 6px 10px; cursor: pointer;';
+            item.addEventListener('mouseover', () => item.style.background = '#f5f5f5');
+            item.addEventListener('mouseout', () => item.style.background = 'white');
+            item.addEventListener('click', async () => {
+                await assignTicket(user.id, selected);
+                modal.remove();
+            });
+            resultBox.appendChild(item);
+        });
+    });
+}
+
+// === Assign Ticket AJAX ===
+async function assignTicket(staffId, ticketIds) {
+    const response = await fetch("{% url 'dashboard:api_assign_tickets' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+        body: JSON.stringify({ staff_id: staffId, ticket_ids: ticketIds })
+    });
+    const data = await response.json();
+    if (data.success) {
+        alert("Tickets assigned successfully!");
+        window.location.reload();
+    } else {
+        alert(data.error || "Failed to assign tickets");
+    }
+}
+
+// === Bulk Delete ===
+async function bulkDelete() {
+    const selected = Array.from(document.querySelectorAll('.ticket-checkbox:checked')).map(cb => cb.value);
+    if (!selected.length) return alert('Select at least one ticket.');
+    if (!confirm(`Delete ${selected.length} ticket(s)?`)) return;
+
+    const response = await fetch("{% url 'dashboard:api_delete_tickets' %}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+        body: JSON.stringify({ ticket_ids: selected })
+    });
+    const data = await response.json();
+    if (data.success) location.reload();
+    else alert(data.error || "Failed to delete tickets");
+}
+</script>
+{% endblock %}

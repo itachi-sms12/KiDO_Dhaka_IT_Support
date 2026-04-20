@@ -1,0 +1,48 @@
+<!-- templates/dashboard/add_user_modal.html -->
+<form method="post" action="{% url 'dashboard:add_user' %}" novalidate>
+    {% csrf_token %}
+    
+    {% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            {{ message|safe }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <div class="mb-3">
+        <label class="form-label">First Name <span class="text-danger">*</span></label>
+        <input type="text" name="first_name" class="form-control" required value="{{ form_data.first_name.0|default:'' }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+        <input type="text" name="last_name" class="form-control" required value="{{ form_data.last_name.0|default:'' }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Email (Username) <span class="text-danger">*</span></label>
+        <input type="email" name="email" class="form-control" required value="{{ form_data.email.0|default:'' }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Password <span class="text-danger">*</span></label>
+        <input type="password" name="password" class="form-control" required placeholder="Enter strong password">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+        <input type="password" name="password2" class="form-control" required placeholder="Repeat password">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Role <span class="text-danger">*</span></label>
+        <select name="role" class="form-select" required>
+            <option value="user" {% if form_data.role.0 == 'user' %}selected{% endif %}>Customer</option>
+            <option value="staff" {% if form_data.role.0 == 'staff' %}selected{% endif %}>Support Staff</option>
+            <option value="admin" {% if form_data.role.0 == 'admin' %}selected{% endif %}>Administrator</option>
+        </select>
+    </div>
+    <div class="text-end">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-success">Create User</button>
+    </div>
+</form>

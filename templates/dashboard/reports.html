@@ -1,0 +1,605 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Analytics - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-nav {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+    }
+    
+    .nav-item {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        color: #64748b;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .nav-item:hover {
+        background: #f8fafc;
+        color: #1e293b;
+    }
+    
+    .nav-item.active {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+    }
+    
+    .date-selector {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .date-range {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .date-input {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .quick-filters {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .quick-filter-btn {
+        padding: 0.625rem 1.25rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .quick-filter-btn:hover,
+    .quick-filter-btn.active {
+        border-color: #3b82f6;
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid;
+    }
+    
+    .metric-card.blue {
+        border-color: #3b82f6;
+    }
+    
+    .metric-card.green {
+        border-color: #10b981;
+    }
+    
+    .metric-card.orange {
+        border-color: #f59e0b;
+    }
+    
+    .metric-card.red {
+        border-color: #ef4444;
+    }
+    
+    .metric-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+    
+    .metric-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 0.5rem 0;
+    }
+    
+    .metric-change {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .metric-change.positive {
+        color: #10b981;
+    }
+    
+    .metric-change.negative {
+        color: #ef4444;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .chart-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-chart-action {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-chart-action:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+    
+    .chart-placeholder {
+        height: 350px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-weight: 600;
+    }
+    
+    .report-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+    
+    .table-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .table-header {
+        padding: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .table-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .report-table {
+        width: 100%;
+    }
+    
+    .report-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .report-table tbody tr:hover {
+        background: #f8fafc;
+    }
+    
+    .report-table td {
+        padding: 1rem 1.5rem;
+        color: #334155;
+    }
+    
+    .agent-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .agent-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+    
+    .agent-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #f1f5f9;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+        border-radius: 1rem;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-fill.green {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+    
+    .progress-fill.orange {
+        background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .export-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.75rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="container">
+        <h1><i class="bi bi-graph-up me-2"></i>Reports & Analytics</h1>
+        <p class="mb-0 opacity-90">Track performance and gain insights from your support data</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="dashboard-nav">
+        <a href="{% url 'dashboard:all_tickets' %}" class="nav-item">
+            <i class="bi bi-ticket-perforated"></i>All Tickets
+        </a>
+        <a href="{% url 'dashboard:manage_categories' %}" class="nav-item">
+            <i class="bi bi-folder"></i>Categories
+        </a>
+        <a href="{% url 'dashboard:manage_users' %}" class="nav-item">
+            <i class="bi bi-people"></i>Users
+        </a>
+        <a href="{% url 'dashboard:reports' %}" class="nav-item active">
+            <i class="bi bi-graph-up"></i>Reports
+        </a>
+    </div>
+    
+    <div class="date-selector">
+        <div class="date-range">
+            <input type="date" class="date-input" value="2024-01-01">
+            <span>to</span>
+            <input type="date" class="date-input" value="2024-12-31">
+        </div>
+        <div class="quick-filters">
+            <button class="quick-filter-btn">Today</button>
+            <button class="quick-filter-btn">Week</button>
+            <button class="quick-filter-btn active">Month</button>
+            <button class="quick-filter-btn">Year</button>
+        </div>
+        <!-- <button class="export-btn">
+            <i class="bi bi-download"></i>
+            Export Report
+        </button> -->
+        <form action="{% url 'dashboard:export_report' %}" method="get" style="display:inline;">
+            <button type="submit" class="btn btn-primary">Export Report</button>
+        </form>
+    </div>
+    
+    <div class="metrics-grid">
+        <div class="metric-card blue">
+            <div class="metric-label">
+                <i class="bi bi-ticket-perforated me-1"></i>Total Tickets
+            </div>
+            <div class="metric-value">2,547</div>
+            <div class="metric-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span>18.2% from last month</span>
+            </div>
+        </div>
+        
+        <div class="metric-card green">
+            <div class="metric-label">
+                <i class="bi bi-check-circle me-1"></i>Resolution Rate
+            </div>
+            <div class="metric-value">94.3%</div>
+            <div class="metric-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span>5.1% from last month</span>
+            </div>
+        </div>
+        
+        <div class="metric-card orange">
+            <div class="metric-label">
+                <i class="bi bi-clock me-1"></i>Avg Response Time
+            </div>
+            <div class="metric-value">2.5h</div>
+            <div class="metric-change negative">
+                <i class="bi bi-arrow-down"></i>
+                <span>12.3% slower</span>
+            </div>
+        </div>
+        
+        <div class="metric-card red">
+            <div class="metric-label">
+                <i class="bi bi-emoji-smile me-1"></i>Customer Satisfaction
+            </div>
+            <div class="metric-value">4.8/5</div>
+            <div class="metric-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span>0.3 points higher</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="chart-card">
+        <div class="chart-header">
+            <div class="chart-title">
+                <i class="bi bi-graph-up-arrow"></i>
+                Ticket Volume Over Time
+            </div>
+            <div class="chart-actions">
+                <button class="btn-chart-action">Day</button>
+                <button class="btn-chart-action">Week</button>
+                <button class="btn-chart-action">Month</button>
+            </div>
+        </div>
+        <div class="chart-placeholder">
+            <i class="bi bi-bar-chart-line me-2" style="font-size: 2rem;"></i>
+            Chart visualization would go here (integrate Chart.js or similar)
+        </div>
+    </div>
+    
+    <div class="report-grid">
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="bi bi-trophy"></i>
+                    Top Performing Agents
+                </div>
+            </div>
+            <table class="report-table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">SM</div>
+                                <div class="agent-name">Sarah Miller</div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.25rem;">156 tickets</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill green" style="width: 95%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">JD</div>
+                                <div class="agent-name">John Doe</div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.25rem;">142 tickets</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill green" style="width: 88%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">AL</div>
+                                <div class="agent-name">Alex Lee</div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.25rem;">128 tickets</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">KW</div>
+                                <div class="agent-name">Kate Wilson</div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.25rem;">115 tickets</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill orange" style="width: 68%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="bi bi-folder"></i>
+                    Tickets by Category
+                </div>
+            </div>
+            <table class="report-table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="bi bi-gear-fill"></i>
+                                </div>
+                                <span style="font-weight: 600; color: #1e293b;">Technical</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b;">956</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">37.5%</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="bi bi-credit-card-fill"></i>
+                                </div>
+                                <span style="font-weight: 600; color: #1e293b;">Billing</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b;">643</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">25.2%</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span style="font-weight: 600; color: #1e293b;">Account</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b;">502</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">19.7%</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="bi bi-chat-dots-fill"></i>
+                                </div>
+                                <span style="font-weight: 600; color: #1e293b;">General</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="font-weight: 700; color: #1e293b;">446</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">17.6%</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Quick filter functionality
+document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.quick-filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+</script>
+{% endblock %}

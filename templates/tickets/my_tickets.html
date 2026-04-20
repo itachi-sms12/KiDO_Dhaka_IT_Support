@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+
+{% block title %}My Tickets - SupportHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tickets-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+    }
+    
+    .tickets-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.5rem;
+        border: 2px solid #e2e8f0;
+        background: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-btn:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+    
+    .filter-btn.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-color: #2563eb;
+    }
+    
+    .ticket-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 2px solid #f1f5f9;
+        transition: all 0.3s ease;
+    }
+    
+    .ticket-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .ticket-id {
+        font-weight: 700;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+    
+    .ticket-subject {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0.5rem 0;
+    }
+    
+    .ticket-description {
+        color: #64748b;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+    
+    .ticket-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .badge-status {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .badge-open {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+    
+    .badge-in-progress {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+    
+    .badge-resolved {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .badge-closed {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+    }
+    
+    .badge-priority {
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge-low {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .badge-medium {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-high {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .badge-urgent {
+        background: #fecaca;
+        color: #7f1d1d;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .ticket-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    
+    .ticket-time {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .btn-view-ticket {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view-ticket:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 5rem;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state p {
+        color: #94a3b8;
+        margin-bottom: 2rem;
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-box input {
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tickets-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="bi bi-inbox-fill me-2"></i>My Tickets</h1>
+                <p class="mb-0 opacity-90">Manage and track all your support requests</p>
+            </div>
+            <a href="{% url 'tickets:create_ticket' %}" class="btn btn-light btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>New Ticket
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="filter-card">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search tickets...">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-md-end">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="bi bi-grid-fill me-1"></i> All
+                    </button>
+                    <button class="filter-btn" data-filter="open">
+                        <i class="bi bi-circle-fill me-1"></i> Open
+                    </button>
+                    <button class="filter-btn" data-filter="in_progress">
+                        <i class="bi bi-arrow-repeat me-1"></i> In Progress
+                    </button>
+                    <button class="filter-btn" data-filter="resolved">
+                        <i class="bi bi-check-circle-fill me-1"></i> Resolved
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="ticketsContainer">
+        {% if tickets %}
+            {% for ticket in tickets %}
+                <div class="ticket-card" data-status="{{ ticket.status }}" data-search="{{ ticket.subject|lower }} {{ ticket.description|lower }}">
+                    <div class="ticket-id">
+                        <i class="bi bi-hash"></i>TICKET-{{ ticket.id }}
+                    </div>
+                    <h3 class="ticket-subject">{{ ticket.subject }}</h3>
+                    <p class="ticket-description">{{ ticket.description|truncatewords:30 }}</p>
+                    
+                    <div class="ticket-meta">
+                        <span class="badge-status badge-{{ ticket.status }}">
+                            {% if ticket.status == 'open' %}
+                                <i class="bi bi-circle-fill me-1"></i>
+                            {% elif ticket.status == 'in_progress' %}
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                            {% elif ticket.status == 'resolved' %}
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle-fill me-1"></i>
+                            {% endif %}
+                            {{ ticket.get_status_display }}
+                        </span>
+                        
+                        <span class="badge-priority badge-{{ ticket.priority }}">
+                            {% if ticket.priority == 'urgent' %}
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            {% elif ticket.priority == 'high' %}
+                                <i class="bi bi-exclamation-circle-fill me-1"></i>
+                            {% elif ticket.priority == 'medium' %}
+                                <i class="bi bi-dash-circle-fill me-1"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill me-1"></i>
+                            {% endif %}
+                            {{ ticket.get_priority_display }} Priority
+                        </span>
+                        
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-folder me-1"></i>{{ ticket.category }}
+                        </span>
+                    </div>
+                    
+                    <div class="ticket-footer">
+                        <div class="ticket-time">
+                            <i class="bi bi-clock"></i>
+                            Created {{ ticket.created_at|timesince }} ago
+                            {% if ticket.assigned_to %}
+                                <span class="mx-2">•</span>
+                                <i class="bi bi-person"></i>
+                                Assigned to {{ ticket.assigned_to.username }}
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'tickets:ticket_detail' ticket.id %}" class="btn btn-view-ticket">
+                            View Details <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h3>No Tickets Found</h3>
+                <p>You haven't created any support tickets yet.</p>
+                <a href="{% url 'tickets:create_ticket' %}" class="btn btn-custom-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Ticket
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div id="noResults" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">
+            <i class="bi bi-search"></i>
+        </div>
+        <h3>No Matching Tickets</h3>
+        <p>Try adjusting your search or filters</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const ticketCards = document.querySelectorAll('.ticket-card');
+    const searchInput = document.getElementById('searchInput');
+    const noResults = document.getElementById('noResults');
+    
+    // Filter functionality
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter');
+            filterTickets(filter, searchInput.value.toLowerCase());
+        });
+    });
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        filterTickets(activeFilter, this.value.toLowerCase());
+    });
+    
+    function filterTickets(statusFilter, searchTerm) {
+        let visibleCount = 0;
+        
+        ticketCards.forEach(card => {
+            const status = card.getAttribute('data-status');
+            const searchText = card.getAttribute('data-search');
+            
+            const matchesStatus = statusFilter === 'all' || status === statusFilter;
+            const matchesSearch = searchTerm === '' || searchText.includes(searchTerm);
+            
+            if (matchesStatus && matchesSearch) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+});
+</script>
+{% endblock %}

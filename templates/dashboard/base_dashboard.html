@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="list-group">
+            <a href="{% url 'dashboard:home' %}" class="list-group-item list-group-item-action">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="{% url 'dashboard:all_tickets' %}" class="list-group-item list-group-item-action">
+                <i class="bi bi-ticket"></i> All Tickets
+            </a>
+            <a href="{% url 'dashboard:manage_users' %}" class="list-group-item list-group-item-action">
+                <i class="bi bi-people"></i> Manage Users
+            </a>
+            <a href="{% url 'dashboard:manage_categories' %}" class="list-group-item list-group-item-action">
+                <i class="bi bi-tags"></i> Categories
+            </a>
+            <a href="{% url 'dashboard:reports' %}" class="list-group-item list-group-item-action">
+                <i class="bi bi-bar-chart"></i> Reports
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        {% block dashboard_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

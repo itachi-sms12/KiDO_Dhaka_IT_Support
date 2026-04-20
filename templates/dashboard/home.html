@@ -1,0 +1,133 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Dashboard - Support Ticket System{% endblock %}
+
+{% block dashboard_content %}
+<h2 class="mb-4">Dashboard Overview</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Tickets</h5>
+                <p class="card-text display-4">{{ total_tickets }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Open Tickets</h5>
+                <p class="card-text display-4">{{ open_tickets }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Resolved Tickets</h5>
+                <p class="card-text display-4">{{ resolved_tickets }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Avg Resolution</h5>
+                <p class="card-text display-4">{{ avg_resolution_hours }}h</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tickets by Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tickets by Category</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Recent Tickets</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in recent_tickets %}
+                <tr>
+                    <td>#{{ ticket.id }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td><span class="badge bg-secondary">{{ ticket.get_status_display }}</span></td>
+                    <td><span class="badge bg-info">{{ ticket.get_priority_display }}</span></td>
+                    <td>{{ ticket.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const statusData = JSON.parse('{{ tickets_by_status|escapejs }}');
+    const categoryData = JSON.parse('{{ tickets_by_category|escapejs }}');
+    
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusData.map(d => d.status),
+            datasets: [{
+                data: statusData.map(d => d.count),
+                backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#6c757d']
+            }]
+        }
+    });
+    
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+            labels: categoryData.map(d => d.category__name || 'Uncategorized'),
+            datasets: [{
+                label: 'Tickets',
+                data: categoryData.map(d => d.count),
+                backgroundColor: '#007bff'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

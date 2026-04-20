@@ -1,0 +1,519 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Ticket #{{ ticket.id }} - SupportHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ticket-header {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .ticket-id-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .ticket-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+    
+    .ticket-meta-header {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .detail-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .detail-card-header {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .ticket-content {
+        line-height: 1.8;
+        color: #334155;
+        font-size: 1.05rem;
+    }
+    
+    .sidebar-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .sidebar-card h6 {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: -1.5rem;
+        top: 0.25rem;
+        width: 1rem;
+        height: 1rem;
+        background: white;
+        border: 3px solid #3b82f6;
+        border-radius: 50%;
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-user {
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .timeline-time {
+        font-size: 0.875rem;
+        color: #94a3b8;
+    }
+    
+    .timeline-text {
+        color: #475569;
+        line-height: 1.6;
+    }
+    
+    .comment-form {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-success-custom {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .btn-success-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+    
+    .btn-danger-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);
+    }
+    
+    .attachment-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .attachment-card:hover {
+        border-color: #3b82f6;
+        background: white;
+    }
+    
+    .attachment-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .attachment-info {
+        flex: 1;
+    }
+    
+    .attachment-name {
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    
+    .attachment-size {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ticket-header">
+    <div class="container">
+        <div class="ticket-id-badge">
+            <i class="bi bi-hash"></i>TICKET-{{ ticket.id }}
+        </div>
+        <h1 class="ticket-title">{{ ticket.subject }}</h1>
+        <div class="ticket-meta-header">
+            <span class="badge-status badge-{{ ticket.status }}">
+                <i class="bi bi-circle-fill me-1"></i>{{ ticket.get_status_display }}
+            </span>
+            <span class="badge-priority badge-{{ ticket.priority }}">
+                {{ ticket.get_priority_display }} Priority
+            </span>
+            <span class="badge bg-light text-dark">
+                <i class="bi bi-folder me-1"></i>{{ ticket.category }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <i class="bi bi-file-text"></i>
+                    Ticket Details
+                </div>
+                <div class="ticket-content">
+                    {{ ticket.description|linebreaks }}
+                </div>
+                
+                {% if ticket.attachment %}
+                <div class="mt-4">
+                    <h6 class="mb-3"><i class="bi bi-paperclip me-2"></i>Attachment</h6>
+                    <a href="{{ ticket.attachment.url }}" target="_blank" class="text-decoration-none">
+                        <div class="attachment-card">
+                            <div class="attachment-icon">
+                                <i class="bi bi-file-earmark"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-name">{{ ticket.attachment.name|slice:"10:" }}</div>
+                                <div class="attachment-size">Click to view</div>
+                            </div>
+                            <i class="bi bi-download"></i>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="detail-card">
+                <div class="detail-card-header">
+                    <i class="bi bi-chat-dots"></i>
+                    Activity & Comments
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div>
+                                    <div class="timeline-user">
+                                        <i class="bi bi-person-circle me-1"></i>{{ ticket.created_by.username|default:"[Deleted User]" }}
+                                    </div>
+                                </div>
+                                <div class="timeline-time">
+                                    <i class="bi bi-clock me-1"></i>{{ ticket.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            <div class="timeline-text">
+                                Created this ticket
+                            </div>
+                        </div>
+                    </div>
+
+                {% if ticket.comments.exists %}
+                    {% for comment in comments %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div>
+                                    <div class="timeline-user">
+                                        <i class="bi bi-person-circle me-1"></i>{{ comment.user.username }}
+                                        {% if comment.is_internal %}
+                                            <span class="badge bg-warning ms-2">Internal</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="timeline-time">
+                                    <i class="bi bi-clock me-1"></i>{{ comment.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            <div class="timeline-text">
+                                {{ comment.content|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No comments yet.</p>
+                {% endif %}
+                </div>
+                
+                <div class="comment-form">
+                    <h6 class="mb-3"><i class="bi bi-plus-circle me-2"></i>Add Comment</h6>
+                    <form method="post" action="{% url 'tickets:add_comment' ticket.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <textarea name="content" class="form-control" rows="4" placeholder="Write your comment here..." required></textarea>
+                        </div>
+                        {% if user.profile.is_staff_member %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="is_internal" id="isInternal">
+                            <label class="form-check-label" for="isInternal">
+                                Internal Note (Only visible to staff)
+                            </label>
+                        </div>
+                        {% endif %}
+                        <button type="submit" name="add_comment" class="btn btn-primary-custom">
+                            <i class="bi bi-send me-2"></i>Post Comment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="sidebar-card">
+                <h6><i class="bi bi-info-circle"></i>Ticket Information</h6>
+                
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value">
+                        <span class="badge-status badge-{{ ticket.status }}">
+                            {{ ticket.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Priority</div>
+                    <div class="info-value">
+                        <span class="badge-priority badge-{{ ticket.priority }}">
+                            {{ ticket.get_priority_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Category</div>
+                    <div class="info-value">{{ ticket.category }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Created By</div>
+                    <div class="info-value">
+                        <i class="bi bi-person-circle me-1"></i>{{ ticket.created_by.username|default:"[Deleted User]" }}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Assigned To</div>
+                    <div class="info-value">
+                        {% if ticket.assigned_to %}
+                            <i class="bi bi-person-check me-1"></i>{{ ticket.assigned_to.username }}
+                        {% else %}
+                            <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Created</div>
+                    <div class="info-value">{{ ticket.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Last Updated</div>
+                    <div class="info-value">{{ ticket.updated_at|timesince }} ago</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-card">
+                <h6><i class="bi bi-gear"></i>Actions</h6>
+                {% if user.profile.is_staff_member %}
+                <form method="post" class="mb-2">
+                    {% csrf_token %}
+                    <button type="submit" name="resolve" class="btn btn-success-custom w-100 mb-2">
+                        <i class="bi bi-check-circle me-2"></i>Mark as Resolved
+                    </button>
+                </form>
+                {% endif %}
+
+                {% if user.profile.is_staff_member %}
+                <form method="post" class="mb-2">
+                    {% csrf_token %}
+                    <button type="submit" name="close" class="btn btn-secondary w-100 mb-2">
+                        <i class="bi bi-x-circle me-2"></i>Close Ticket
+                    </button>
+                </form>
+                {% endif %}
+            {% if ticket.status == "closed" or ticket.status == "resolved" %}
+                <form method="post" class="mb-2">
+                    {% csrf_token %}
+                    <button type="submit" name="reopen" class="btn btn-warning w-100 mb-2">
+                        <i class="bi bi-arrow-repeat me-2"></i>Reopen Ticket
+                    </button>
+                </form>
+                        {% endif %}
+                {% if user.profile.is_staff_member %}
+                <button class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#assignModal">
+                    <i class="bi bi-person-plus me-2"></i>Assign Staff
+                </button>
+                <!-- Assign Staff Modal -->
+                <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="assignModalLabel">Assign Ticket to Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="assigned_to" class="form-label">Select Staff Member</label>
+                            <select name="assigned_to" id="assigned_to" class="form-select" required>
+                            <option value="">-- Select Staff --</option>
+                            {% for staff in staff_list %}
+                                <option value="{{ staff.id }}" {% if ticket.assigned_to and staff.id == ticket.assigned_to.id %}selected{% endif %}>
+                                {{ staff.username }}
+                                </option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="assign_staff" class="btn btn-primary">Assign</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                </div>
+                {% endif %}
+                
+                <a href="{% url 'tickets:edit' ticket.id %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-pencil me-2"></i>Edit Ticket
+                </a>
+
+            </div>
+            
+            <div class="sidebar-card">
+                <h6><i class="bi bi-arrow-left-circle"></i>Navigation</h6>
+                <a href="{% url 'tickets:my_tickets' %}" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-list me-2"></i>Back to My Tickets
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

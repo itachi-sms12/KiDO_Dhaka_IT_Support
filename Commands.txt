@@ -1,0 +1,42 @@
+venv\Scripts\activate
+
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+
+fornew (python -m pip install -r requirements.txt
+)
+
+
+nssm.exe install DjangoPortal
+
+nssm restart DjangoPortal
+
+python manage.py runserver (Ip change  : python manage.py runserver 0.0.0.0:8000 )
+
+
+-------------------------------------------Remove-Item -Recurse -Force venv
+
+
+python -m venv venv
+
+| Action              | Command (Admin PowerShell)         |
+| ------------------- | ---------------------------------- |
+| Start the service   | `nssm start DjangoPortal`          |
+| Stop the service    | `nssm stop DjangoPortal`           |
+| Restart the service | `nssm restart DjangoPortal`        |
+| Remove the service  | `nssm remove DjangoPortal confirm` |
+| Edit configuration  | `nssm edit DjangoPortal`           |
+
+
+nssm.exe install DjangoPortal
+
+Arugument:manage.py runserver 0.0.0.0:8000
+
+
+
+password:admin123
+
+Port:5432
+
+djuser
+
+woPq_CJz4(pydnuf
