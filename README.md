@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 🧾 **Support Ticket System**
 
 A streamlined, full-stack web application for managing internal and external support requests.  
@@ -136,3 +137,7 @@ Software Developer | Automation & Backend Engineering
 📧 *Reach me on GitHub → [Senthil-vsk](https://github.com/Senthil-vsk),*
 🌐 Email → senthilsk8716@gmail.com
 
+=======
+# KiDO_Dhaka_IT_Support
+For IT support make more easier 
+>>>>>>> e33ddd401165c6059481c23e5bd389760c726012
